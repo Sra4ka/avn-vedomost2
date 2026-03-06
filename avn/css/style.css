@@ -1,0 +1,181 @@
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: url('https://bogatyr.club/uploads/posts/2023-02/thumbs/1675452660_bogatyr-club-p-fon-obrazovanie-fon-vkontakte-11.jpg') 
+                no-repeat center center/cover;
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+   
+}
+
+
+.container {
+    width: 100%;
+    max-width: 1400px;
+    margin: auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: center;
+}
+
+
+header {
+    background: #00abf5;
+    width: 100%;
+    height: 80px;
+    box-shadow: 0 0 20px rgba(171, 156, 156, 0.8);
+    border-radius: 0 0 20px 20px;
+    border: 1px solid #fff;
+    display: flex;
+    align-items: center;
+    
+    
+    padding: 0 20px;
+}
+
+
+header img {
+    width: 60px;
+    height: auto;
+    margin: baseline 10px ;    
+}
+header img::after{
+    content: "";
+}
+
+
+header h2 {
+    text-transform: uppercase;
+    color: #fff;
+    font-size: 26px;
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+    transition: color 0.5s ease, transform 0.5s ease;
+    margin: 0 0 0 29%;
+}
+
+
+header h2:hover {
+    color: #26d2f5;
+    transform: scale(1.1);
+    text-shadow: 0 5px 10px #0448a9;
+}
+
+
+.plashs {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin: 50px auto;
+    padding: 0 20px;
+}
+
+
+.plashs .windows img {
+    width: 150px;
+    height: 150px;
+    background: #f1eded;
+    border-radius: 20px;
+    padding: 15pX;
+    margin:20px ;
+    box-shadow: 0 20px 30px rgba(4, 135, 171, 0.5);
+    cursor: pointer;
+    transition: transform 0.5s ease, box-shadow 0.5s ease;
+}
+
+
+
+.plashs .windows img:hover {
+    box-shadow: 0 10px 30px rgba(7, 62, 78, 0.9);
+    transform: rotateX(15deg) rotateY(10deg) scale(1.1);
+}
+
+footer {
+    text-align: center;
+    font-size: 18px;
+    color: #2973db;
+    font-weight: 600;
+    text-shadow: 0 4px 10px #193d6f;
+    padding: 20px;
+    transition: color 0.5s ease, transform 0.5s ease;
+    margin-top: auto;
+}
+
+
+footer:hover {
+    color: #26d2f5;
+    transform: scale(1.1);
+    text-shadow: 0 5px 10px #0448a9;
+}
+
+
+@media (max-width: 1024px) {
+    .container {
+        max-width: 90%;
+    }
+
+    header {
+        height: 70px;
+        
+    }
+
+    header h2 {
+        font-size: 22px;
+        margin: auto;
+    }
+
+    .plashs .windows img {
+        width: 100px;
+        height: 100px;
+        padding: 10px;
+        transition: all 0.5s ease;
+
+    }
+}
+
+@media (max-width: 768px) {
+    header {
+        display: flex;
+        align-items: center;
+        height: 60px;
+        padding: 0 10px;
+        position: relative;
+    }
+
+    header img {
+        width: 50px;
+        margin-right: 10px;
+    }
+
+    header h2 {
+        font-size: 18px;
+    }
+
+    .plashs {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        
+    }
+
+    .plashs .windows img {
+        display: flex;
+        flex-direction: row-reverse;
+        image-rendering: auto; /* Это поможет сохранить четкость */ 
+        transition: all 2s ease;
+        padding: 500px;
+        width: 50dvh;
+        height: 150px;
+        padding: 8px;
+        
+    }
+
+    footer {
+        font-size: 16px;
+    }
+}

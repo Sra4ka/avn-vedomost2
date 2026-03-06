@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LMS AVN | Ведомость: Предметы и Группы</title>
+    <style>
+        :root {
+            --avn-blue: #0056b3;
+            --avn-bg: #e9ecef;
+            --border-color: #abb2b9;
+            --rk-bg: #ebf5fb;
+            --ok-bg: #fef9e7;
+            --srs-bg: #f4ecf7;
+            --exam-bg: #eafaf1;
+            --danger: #e74c3c;
+            --success: #27ae60;
+        }
+
+        body { font-family: 'Tahoma', sans-serif; background: var(--avn-bg); margin: 0; padding: 20px; font-size: 12px; }
+        .wrapper { background: white; border: 1px solid var(--border-color); padding: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); max-width: 1400px; margin: 0 auto; border-radius: 4px; }
+
+        .header { display: flex; justify-content: space-between; border-bottom: 3px solid var(--avn-blue); margin-bottom: 15px; padding-bottom: 10px; }
+        .logo-text { font-weight: bold; color: var(--avn-blue); font-size: 20px; line-height: 1.1; }
+
+        /* Селекторы */
+        .selectors-row { display: flex; gap: 15px; margin-bottom: 15px; }
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-btn { background: white; border: 2px solid var(--avn-blue); padding: 8px 15px; font-weight: bold; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; min-width: 200px; justify-content: space-between; }
+        .dropdown-btn:after { content: '▼'; font-size: 9px; }
+        
+        .dropdown-content { display: none; position: absolute; background-color: white; min-width: 100%; box-shadow: 0px 8px 16px rgba(0,0,0,0.2); z-index: 10; border: 1px solid #ccc; border-radius: 4px; max-height: 250px; overflow-y: auto; }
+        .dropdown-content div { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid #eee; }
+        .dropdown-content div:hover { background-color: #f1f1f1; }
+        .btn-new { background: #f0fff0 !important; color: green; font-weight: bold; }
+        .show { display: block; }
+
+        .stats-bar { display: flex; gap: 20px; background: #fffde7; border: 1px solid #f1c40f; padding: 10px; margin-bottom: 15px; border-radius: 4px; font-weight: bold; }
+
+        .controls { background: #f8f9fa; border: 1px solid var(--border-color); padding: 15px; margin-bottom: 15px; display: grid; grid-template-columns: 1fr auto; gap: 15px; border-radius: 4px; }
+        .input-row { display: flex; gap: 10px; align-items: center; }
+        input { padding: 7px; border: 1px solid #ccc; border-radius: 3px; }
+        
+        .btn { padding: 8px 15px; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; color: white; display: flex; align-items: center; gap: 5px; }
+        .btn-add { background: var(--avn-blue); }
+        .btn-excel { background: #1d6f42; }
+        .btn-clear { background: var(--danger); }
+
+        table.avn-table { width: 100%; border-collapse: collapse; background: white; }
+        table.avn-table th { border: 1px solid var(--border-color); padding: 6px; background: #f2f2f2; font-size: 11px; }
+        table.avn-table td { border: 1px solid var(--border-color); padding: 5px; text-align: center; }
+        .fio-cell { text-align: left !important; font-weight: bold; padding-left: 10px !important; }
+
+        .c-total { background: #fdedec; font-weight: bold; font-size: 14px; color: #943126; }
+        input[type="number"] { width: 40px; text-align: center; font-weight: bold; }
+        .grade-box { font-weight: bold; padding: 3px 6px; border-radius: 3px; color: white; display: inline-block; min-width: 60px; }
+        .g-5 { background: var(--success); } .g-4 { background: var(--avn-blue); } .g-3 { background: #f39c12; } .g-2 { background: var(--danger); } .g-none { background: #7f8c8d; }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="header">
+        <div class="logo-text">LMS AVN 2.0<br><span style="font-size: 11px; color: #555; font-weight: normal;">Управление ведомостями: Предметы и Группы</span></div>
+        <div style="text-align: right"><b>2025-2026</b></div>
+    </div>
+
+    <div class="selectors-row">
+        <div class="dropdown">
+            <label style="display:block; font-size:10px; color:#666">Дисциплина:</label>
+            <button class="dropdown-btn" id="subjectBtn" onclick="toggleDrop('subjectDrop')">Выберите предмет...</button>
+            <div class="dropdown-content" id="subjectDrop"></div>
+        </div>
+
+        <div class="dropdown">
+            <label style="display:block; font-size:10px; color:#666">Академ. группа:</label>
+            <button class="dropdown-btn" id="groupBtn" onclick="toggleDrop('groupDrop')">Выберите группу...</button>
+            <div class="dropdown-content" id="groupDrop"></div>
+        </div>
+    </div>
+
+    <div class="stats-bar" id="statsBar" style="display:none">
+        <div>Предмет: <span id="viewSubj" style="color:var(--avn-blue)">-</span></div>
+        <div>Группа: <span id="viewGroup" style="color:var(--avn-blue)">-</span></div>
+        <div>| Студентов: <span id="statTotal">0</span></div>
+        <div>| Ср. балл: <span id="statAvg">0.0</span></div>
+    </div>
+
+    <div class="controls" id="controlsBox" style="display:none">
+        <div class="input-row">
+            <strong>ФИО:</strong>
+            <input type="text" id="studentName" placeholder="Иванов Иван Иванович" onkeypress="if(event.key==='Enter') addStudent()" style="width:250px">
+            <button class="btn btn-add" onclick="addStudent()">+ Добавить студента</button>
+            <input type="text" id="searchField" placeholder="🔍 Быстрый поиск..." oninput="renderTable()" style="margin-left:10px; background:#fffde7">
+        </div>
+        <div class="input-row">
+            <button class="btn btn-excel" onclick="exportToExcel()">📊 Выгрузить в Excel</button>
+            <button class="btn btn-clear" onclick="clearGroup()">Очистить группу</button>
+        </div>
+    </div>
+
+    <table class="avn-table" id="mainTable" style="display:none">
+        <thead>
+            <tr>
+                <th rowspan="2">№</th>
+                <th rowspan="2">ФИО Студента</th>
+                <th colspan="3">Модуль 1</th>
+                <th colspan="3">Модуль 2</th>
+                <th rowspan="2">Рейтинг</th>
+                <th rowspan="2">Экз.</th>
+                <th rowspan="2" class="c-total">Итого</th>
+                <th rowspan="2">Оценка</th>
+                <th rowspan="2"></th>
+            </tr>
+            <tr>
+                <th>РК1</th><th>ОК1</th><th>СРС1</th>
+                <th>РК2</th><th>ОК2</th><th>СРС2</th>
+            </tr>
+        </thead>
+        <tbody id="vedomostBody"></tbody>
+    </table>
+</div>
+
+<script>
+    // Структура данных: db = { "Предмет": { "Группа": [студенты] } }
+    let db = JSON.parse(localStorage.getItem('avn_full_db')) || { "Информатика": { "ПИ-1-22": [] } };
+    let curSubj = null;
+    let curGroup = null;
+
+    window.onload = () => {
+        updateSubjectDrop();
+        updateGroupDrop();
+    };
+
+    function toggleDrop(id) {
+        document.getElementById(id).classList.toggle("show");
+    }
+
+    window.onclick = (e) => {
+        if (!e.target.matches('.dropdown-btn')) {
+            document.querySelectorAll('.dropdown-content').forEach(d => d.classList.remove('show'));
+        }
+    };
+
+    // Предметы
+    function updateSubjectDrop() {
+        const drop = document.getElementById("subjectDrop");
+        drop.innerHTML = "";
+        Object.keys(db).forEach(s => {
+            let d = document.createElement("div");
+            d.innerText = s;
+            d.onclick = () => selectSubject(s);
+            drop.appendChild(d);
+        });
+        let add = document.createElement("div");
+        add.innerText = "+ Добавить предмет...";
+        add.className = "btn-new";
+        add.onclick = () => { let n = prompt("Название предмета:"); if(n){ if(!db[n]) db[n]={}; selectSubject(n); updateSubjectDrop(); } };
+        drop.appendChild(add);
+    }
+
+    function selectSubject(s) {
+        curSubj = s;
+        curGroup = null;
+        document.getElementById('subjectBtn').innerText = s;
+        document.getElementById('groupBtn').innerText = "Выберите группу...";
+        updateGroupDrop();
+        hideTable();
+    }
+
+    // Группы
+    function updateGroupDrop() {
+        const drop = document.getElementById("groupDrop");
+        drop.innerHTML = "";
+        if (!curSubj) return;
+        Object.keys(db[curSubj]).forEach(g => {
+            let d = document.createElement("div");
+            d.innerText = g;
+            d.onclick = () => selectGroup(g);
+            drop.appendChild(d);
+        });
+        let add = document.createElement("div");
+        add.innerText = "+ Создать группу...";
+        add.className = "btn-new";
+        add.onclick = () => { let n = prompt("Номер группы:"); if(n){ if(!db[curSubj][n]) db[curSubj][n]=[]; selectGroup(n); updateGroupDrop(); } };
+        drop.appendChild(add);
+    }
+
+    function selectGroup(g) {
+        curGroup = g;
+        document.getElementById('groupBtn').innerText = g;
+        showTable();
+        renderTable();
+    }
+
+    // Таблица
+    function showTable() {
+        document.getElementById('statsBar').style.display = 'flex';
+        document.getElementById('controlsBox').style.display = 'grid';
+        document.getElementById('mainTable').style.display = 'table';
+        document.getElementById('viewSubj').innerText = curSubj;
+        document.getElementById('viewGroup').innerText = curGroup;
+    }
+
+    function hideTable() {
+        document.getElementById('statsBar').style.display = 'none';
+        document.getElementById('controlsBox').style.display = 'none';
+        document.getElementById('mainTable').style.display = 'none';
+    }
+
+    function addStudent() {
+        let n = document.getElementById('studentName');
+        if(!n.value) return;
+        db[curSubj][curGroup].push({id:Date.now(), name:n.value, rk1:0, ok1:0, srs1:0, rk2:0, ok2:0, srs2:0, exam:0});
+        n.value = ""; save(); renderTable();
+    }
+
+    function updateScore(id, f, v) {
+        let s = db[curSubj][curGroup].find(x => x.id === id);
+        let val = parseFloat(v) || 0;
+        s[f] = val; save(); renderTable();
+    }
+
+    function removeStudent(id) { if(confirm("Удалить студента?")){ db[curSubj][curGroup] = db[curSubj][curGroup].filter(x => x.id !== id); save(); renderTable(); } }
+    function clearGroup() { if(confirm("Очистить список группы?")){ db[curSubj][curGroup] = []; save(); renderTable(); } }
+    function save() { localStorage.setItem('avn_full_db', JSON.stringify(db)); }
+
+    function renderTable() {
+        const body = document.getElementById('vedomostBody');
+        const search = document.getElementById('searchField').value.toLowerCase();
+        body.innerHTML = "";
+        let sum = 0, count = 0;
+
+        db[curSubj][curGroup].filter(x => x.name.toLowerCase().includes(search)).forEach((s, i) => {
+            let r = s.rk1 + s.ok1 + s.srs1 + s.rk2 + s.ok2 + s.srs2;
+            let ok = r >= 30;
+            let total = r + (ok ? s.exam : 0);
+            sum += total; count++;
+
+            let gT = "2", gC = "g-2";
+            if(!ok) { gT="Н/Д"; gC="g-none"; }
+            else if(total >= 87) { gT="5"; gC="g-5"; }
+            else if(total >= 74) { gT="4"; gC="g-4"; }
+            else if(total >= 60) { gT="3"; gC="g-3"; }
+
+            body.innerHTML += `<tr>
+                <td>${i+1}</td>
+                <td class="fio-cell">${s.name}</td>
+                <td><input type="number" value="${s.rk1}" onchange="updateScore(${s.id},'rk1',this.value)"></td>
+                <td><input type="number" value="${s.ok1}" onchange="updateScore(${s.id},'ok1',this.value)"></td>
+                <td><input type="number" value="${s.srs1}" onchange="updateScore(${s.id},'srs1',this.value)"></td>
+                <td><input type="number" value="${s.rk2}" onchange="updateScore(${s.id},'rk2',this.value)"></td>
+                <td><input type="number" value="${s.ok2}" onchange="updateScore(${s.id},'ok2',this.value)"></td>
+                <td><input type="number" value="${s.srs2}" onchange="updateScore(${s.id},'srs2',this.value)"></td>
+                <td style="color:${ok?'green':'red'}; font-weight:bold">${r}</td>
+                <td><input type="number" value="${s.exam}" ${!ok?'disabled':''} onchange="updateScore(${s.id},'exam',this.value)"></td>
+                <td class="c-total">${total}</td>
+                <td><span class="grade-box ${gC}">${gT}</span></td>
+                <td><button onclick="removeStudent(${s.id})" style="border:none; background:none; cursor:pointer">❌</button></td>
+            </tr>`;
+        });
+        document.getElementById('statTotal').innerText = db[curSubj][curGroup].length;
+        document.getElementById('statAvg').innerText = db[curSubj][curGroup].length ? (sum/db[curSubj][curGroup].length).toFixed(1) : "0.0";
+    }
+
+    function exportToExcel() {
+        let html = document.getElementById('mainTable').outerHTML.replace(/<input[^>]*value="([^"]*)"[^>]*>/g, "$1").replace(/<button[^>]*>.*?<\/button>/g, "");
+        const blob = new Blob(['\ufeff' + html], { type: 'application/vnd.ms-excel' });
+        const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: `${curSubj}_${curGroup}.xls` });
+        a.click();
+    }
+</script>
+</body>
+</html>
